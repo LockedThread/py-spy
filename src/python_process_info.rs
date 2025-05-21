@@ -289,7 +289,10 @@ where
     P: ProcessMemory,
 {
     // If possible, grab the sys.version string from the processes memory (mac osx).
-    if let Some(&addr) = python_info.get_symbol("Py_GetVersion.version") {
+    if let Some(&addr) = python_info
+        .get_symbol("Py_GetVersion.version")
+        .or_else(|| python_info.get_symbol("version"))
+    {
         info!("Getting version from symbol address");
         let res: Result<Option<Version>, Error> = (|| {
             let bytes = process.copy(addr as usize, 128)?;
