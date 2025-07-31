@@ -478,6 +478,31 @@ where
     Ok(formatted)
 }
 
+/// Format the numpy scalar to a string.
+///
+/// All numpy scalars have shape:
+/// {
+///     ob_base: PyObject,
+///     obval: <value>,
+/// }
+///
+/// Where `obval` can be of different sizes depending on the scalar type.
+/// We match the size to the value_type_name for this purpose, avoiding the
+/// need to build bindings for the numpy C API.
+///
+/// * `addr`: Address of the numpy scalar
+/// * `process`: Process memory in which the object resides
+fn format_obval<T, P>(addr: usize, process: &P) -> Result<String, Error>
+where
+    T: std::fmt::Display + Copy,
+    P: ProcessMemory,
+{
+    let base_addr = addr as *mut u32;
+    let offset = std::mem::size_of::<crate::python_bindings::v3_7_0::PyObject>() as isize;
+    let result = unsafe { process.copy_pointer(base_addr.byte_offset(offset) as *const T)? };
+    Ok(format!("{}", result))
+}
+
 #[cfg(test)]
 pub mod tests {
     // the idea here is to create various cpython interpretator structs locally
