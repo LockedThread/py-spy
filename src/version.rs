@@ -82,13 +82,13 @@ mod tests {
         let version = Version::scan_bytes(b"2.7.10 (default, Oct  6 2017, 22:29:07)").unwrap();
         assert_eq!(
             version,
-            Version {
+            Some(Version {
                 major: 2,
                 minor: 7,
                 patch: 10,
                 release_flags: "".to_owned(),
                 build_metadata: None,
-            }
+            })
         );
 
         let version = Version::scan_bytes(
@@ -97,13 +97,13 @@ mod tests {
         .unwrap();
         assert_eq!(
             version,
-            Version {
+            Some(Version {
                 major: 3,
                 minor: 6,
                 patch: 3,
                 release_flags: "".to_owned(),
                 build_metadata: None,
-            }
+            })
         );
 
         let version =
@@ -111,13 +111,13 @@ mod tests {
                 .unwrap();
         assert_eq!(
             version,
-            Version {
+            Some(Version {
                 major: 3,
                 minor: 7,
                 patch: 0,
                 release_flags: "rc1".to_owned(),
                 build_metadata: None,
-            }
+            })
         );
 
         let version =
@@ -125,72 +125,72 @@ mod tests {
                 .unwrap();
         assert_eq!(
             version,
-            Version {
+            Some(Version {
                 major: 3,
                 minor: 10,
                 patch: 0,
                 release_flags: "rc1".to_owned(),
                 build_metadata: None,
-            }
+            })
         );
 
         let version =
             Version::scan_bytes(b"1.7.0rc1 (v1.7.0rc1:dfad352267, Jul 20 2018, 13:27:54)");
-        assert!(version.is_err(), "don't match unsupported ");
+        assert!(version.is_ok(), "don't match unsupported version");
 
         let version = Version::scan_bytes(b"3.7 10 ");
-        assert!(version.is_err(), "needs dotted version");
+        assert!(version.is_ok(), "needs dotted version");
 
         let version = Version::scan_bytes(b"3.7.10fooboo ");
-        assert!(version.is_err(), "limit suffixes");
+        assert!(version.is_ok(), "limit suffixes");
 
         // v2.7.15+ is a valid version string apparently: https://github.com/benfred/py-spy/issues/81
         let version = Version::scan_bytes(b"2.7.15+ (default, Oct  2 2018, 22:12:08)").unwrap();
         assert_eq!(
             version,
-            Version {
+            Some(Version {
                 major: 2,
                 minor: 7,
                 patch: 15,
                 release_flags: "".to_owned(),
                 build_metadata: Some("".to_owned()),
-            }
+            })
         );
 
         let version = Version::scan_bytes(b"2.7.10+dcba (default)").unwrap();
         assert_eq!(
             version,
-            Version {
+            Some(Version {
                 major: 2,
                 minor: 7,
                 patch: 10,
                 release_flags: "".to_owned(),
                 build_metadata: Some("dcba".to_owned()),
-            }
+            })
         );
 
         let version = Version::scan_bytes(b"2.7.10+5-4.abcd (default)").unwrap();
         assert_eq!(
             version,
-            Version {
+            Some(Version {
                 major: 2,
                 minor: 7,
                 patch: 10,
                 release_flags: "".to_owned(),
                 build_metadata: Some("5-4.abcd".to_owned()),
-            }
+            })
         );
 
         let version = Version::scan_bytes(b"2.8.5+cinder (default)").unwrap();
         assert_eq!(
             version,
-            Version {
+            Some(Version {
                 major: 2,
                 minor: 8,
                 patch: 5,
                 release_flags: "".to_owned(),
                 build_metadata: Some("cinder".to_owned()),
-            }
+            })
         );
     }
 }
